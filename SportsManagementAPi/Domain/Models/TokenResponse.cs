@@ -1,5 +1,4 @@
-
-using SportsManagementAPi.Domain.Security.Tokens;
+using SportsManagementAPi.Domain.Security;
 
 namespace SportsManagementAPi.Domain.Models
 {

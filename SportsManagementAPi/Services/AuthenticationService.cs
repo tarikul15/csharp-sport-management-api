@@ -1,18 +1,18 @@
 using System.Threading.Tasks;
-using JWTAPI.Core.Security.Hashing;
-using JWTAPI.Core.Security.Tokens;
-using JWTAPI.Core.Services;
-using JWTAPI.Core.Services.Communication;
+using SportsManagementAPi.Domain.Services;
+using Microsoft.AspNetCore.Identity;
+using SportsManagementAPi.Domain.Models;
+using SportsManagementAPi.Domain.Security;
 
-namespace JWTAPI.Services
+namespace SportsManagementAPi.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IUserService _userService;
+        private readonly IManagerService _userService;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenHandler _tokenHandler;
         
-        public AuthenticationService(IUserService userService, IPasswordHasher passwordHasher, ITokenHandler tokenHandler)
+        public AuthenticationService(IManagerService userService, IPasswordHasher passwordHasher, ITokenHandler tokenHandler)
         {
             _tokenHandler = tokenHandler;
             _passwordHasher = passwordHasher;

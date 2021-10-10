@@ -1,6 +1,5 @@
 using System;
-
-namespace SportsManagementAPi.Domain.Security.Tokens
+namespace SportsManagementAPi.Domain.Security
 {
     public class AccessToken : JsonWebToken
     {
