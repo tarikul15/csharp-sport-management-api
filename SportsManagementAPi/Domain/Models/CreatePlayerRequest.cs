@@ -5,14 +5,10 @@ using System.Threading.Tasks;
 
 namespace SportsManagementAPi.Domain.Models
 {
-    public class Team
+    public class CreatePlayerRequest
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
-        public Guid ManagerId { get; set; }
-
-        public Manager Manager { get; set; }
-
-        public List<Player> Players { get; set; }
+        public string TeamName { get; set; }
+        public string Details { get; set; }
     }
 }

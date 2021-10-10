@@ -7,6 +7,10 @@ namespace SportsManagementAPi.Domain.Repositories
     {
         Task AddTeamAsync(Team team);
         
-        Task<Team> FindByName(string name);
+        Task<Team> FindTeamByName(string name);
+
+        Task AddPlayerAsync(Player player);
+
+        Task<Player> FindPlayerByName(string name);
     }
 }

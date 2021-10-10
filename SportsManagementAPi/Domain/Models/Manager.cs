@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 
 namespace SportsManagementAPi.Domain.Models
@@ -12,5 +13,7 @@ namespace SportsManagementAPi.Domain.Models
         public string Password { get; set; }
 
         public Team Team { get; set; }
+
+        public List<Player> Players { get; set; }
     }
 }

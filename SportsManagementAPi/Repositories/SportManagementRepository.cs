@@ -21,11 +21,22 @@ namespace SportsManagementAPi.Repositories
             await _context.Teams.AddAsync(team);
         }
 
-        public async Task<Team> FindByName(string name)
+        public async Task<Team> FindTeamByName(string name)
         {
             return await _context.Teams.SingleOrDefaultAsync(u => u.Name == name);
 
         }
+
+        public async Task AddPlayerAsync(Player player)
+        {
+            await _context.Players.AddAsync(player);
+        }
+
+        public async Task<Player> FindPlayerByName(string name)
+        {
+            return await _context.Players.SingleOrDefaultAsync(p => p.Name == name);
+        }
+
 
     }
 }

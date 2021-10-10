@@ -19,8 +19,8 @@ namespace SportsManagementAPi.Services
 
         public async Task<CreateTeamResponse> CreateTeamAsync(Team team)
         {
-            var existingUser = await _sportManagementRepository.FindByName(team.Name);
-            if (existingUser != null)
+            var existingTeam = await _sportManagementRepository.FindTeamByName(team.Name);
+            if (existingTeam != null)
             {
                 return new CreateTeamResponse(false, "Name already in use.", null);
             }
@@ -32,5 +32,28 @@ namespace SportsManagementAPi.Services
             return new CreateTeamResponse(true, null, team);
         }
 
+        public async Task<Team> FindTeamByNameAsync(string name)
+        {
+            return await _sportManagementRepository.FindTeamByName(name);
+        }
+
+        public async Task<CreatePlayerResponse> CreatePlayerAsync(Player player)
+        {
+            var existingPlayer = await _sportManagementRepository.FindPlayerByName(player.Name);
+            if (existingPlayer != null)
+            {
+                return new CreatePlayerResponse(false, "Name already in use.", null);
+            }
+
+            await _sportManagementRepository.AddPlayerAsync(player);
+            await _unitOfWork.CompleteAsync();
+
+            return new CreatePlayerResponse(true, null, player);
+        }
+
+        public async Task<Player> FindPlayerByNameAsync(string name)
+        {
+            return await _sportManagementRepository.FindPlayerByName(name);
+        }
     }
 }

@@ -56,6 +56,38 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [HttpPost("createPlayer")]
+        [Authorize]
+
+        public async Task<IActionResult> CreatePlayer([FromBody] CreatePlayerRequest playerRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var player = _mapper.Map<CreatePlayerRequest, Player>(playerRequest);
+                var team = await _sportManagementService.FindTeamByNameAsync(playerRequest.TeamName);
+                player.TeamId = team.Id;
+                player.ManagerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+
+                var response = await _sportManagementService.CreatePlayerAsync(player);
+                if (!response.Success)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                var playerResource = _mapper.Map<Player, PlayerResource>(response.Player);
+                return Ok(playerResource);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
         //public IActionResult Privacy()
         //{
         //    return View();
