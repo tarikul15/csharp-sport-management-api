@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SportsManagementAPi.Domain.Models;
@@ -37,6 +39,47 @@ namespace SportsManagementAPi.Repositories
             return await _context.Players.SingleOrDefaultAsync(p => p.Name == name);
         }
 
+        public async Task AddScheduleAsync(Schedule schedule)
+        {
+            await _context.Schedules.AddAsync(schedule);
+        }
 
+        public async Task<Schedule> FindScheduleByTimeAndTeams(DateTime time, Guid homeTeamId, Guid awayTeamId)
+        {
+            return await _context.Schedules.SingleOrDefaultAsync(s=>s.ScheduledTime == time 
+                                                                    && s.HomeTeamId == homeTeamId 
+                                                                    && s.AwayTeamId == awayTeamId);
+        }
+
+        public async Task AddResultAsync(Result result)
+        {
+            await _context.Results.AddAsync(result);
+        }
+
+        public async Task<Schedule> FindScheduleByGameId(Guid gameId)
+        {
+            return await _context.Schedules.SingleOrDefaultAsync(s => s.GameId == gameId);
+        }
+
+        public async Task<Team> FindTeamById(Guid teamId)
+        {
+            return await _context.Teams.SingleOrDefaultAsync(t => t.Id == teamId);
+        }
+
+        public async Task<List<Player>> GetPlayersByManagerId(Guid managerId)
+        {
+            return await _context.Players.Where(p => p.ManagerId == managerId).ToListAsync();
+        }
+
+        public async Task DeletePlayerById(Guid id)
+        {
+            var playerToDelete = await _context.Players.SingleOrDefaultAsync(p => p.Id == id);
+             _context.Players.Remove(playerToDelete);
+        }
+
+        public async Task<Player> FindPlayerById(Guid playerId)
+        {
+            return await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId);
+        }
     }
 }

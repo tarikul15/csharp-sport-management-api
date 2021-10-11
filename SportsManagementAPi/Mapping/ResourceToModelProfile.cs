@@ -17,6 +17,11 @@ namespace SportsManagementAPi.Mapping
 
             CreateMap<CreatePlayerRequest, Player>()
                 .ForMember(p => p.Id, opt => opt.MapFrom(c => Guid.NewGuid()));
+
+            CreateMap<CreateScheduleRequest, Schedule>()
+                .ForMember(s => s.GameId, opt => opt.MapFrom(c => Guid.NewGuid()));
+
+            CreateMap<CreateResultRequest, Result>();
         }
     }
 }

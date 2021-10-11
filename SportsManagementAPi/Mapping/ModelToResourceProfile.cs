@@ -14,6 +14,12 @@ namespace SportsManagementAPi.Mapping
 
             CreateMap<Team, TeamResource>();
 
+            CreateMap<Player, PlayerResource>();
+
+            CreateMap<Schedule, ScheduleResource>();
+
+            CreateMap<Result, ResultResource>();
+
             CreateMap<AccessToken, AccessTokenResource>()
                 .ForMember(a => a.AccessToken, opt => opt.MapFrom(a => a.Token))
                 .ForMember(a => a.RefreshToken, opt => opt.MapFrom(a => a.RefreshToken.Token))

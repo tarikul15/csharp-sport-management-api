@@ -14,5 +14,9 @@ namespace SportsManagementAPi.Domain.Models
         public Manager Manager { get; set; }
 
         public List<Player> Players { get; set; }
+
+        public List<Schedule> Schedules { get; set; }
+
+        public List<Result> Results { get; set; }
     }
 }

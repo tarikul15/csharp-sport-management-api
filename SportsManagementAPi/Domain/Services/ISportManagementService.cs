@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using SportsManagementAPi.Domain.Models;
 
 namespace SportsManagementAPi.Domain.Services
@@ -12,5 +14,13 @@ namespace SportsManagementAPi.Domain.Services
         Task<CreatePlayerResponse> CreatePlayerAsync(Player player);
 
         Task<Player> FindPlayerByNameAsync(string name);
+
+        Task<CreateScheduleResponse> CreateScheduleAsync(Schedule schedule);
+
+        Task<CreateResultResponse> CreateResultAsync(Result result);
+
+        Task<GetPlayersResponse> GetPlayersByManagerId(Guid managerId);
+
+        Task<DeletePlayerResponse> DeletePlayerById(Guid playerId, Guid managerId);
     }
 }

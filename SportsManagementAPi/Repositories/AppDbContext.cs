@@ -11,6 +11,10 @@ namespace SportsManagementAPi.Repositories
 
         public DbSet<Player> Players { get; set; }
 
+        public DbSet<Schedule> Schedules { get; set; }
+
+        public DbSet<Result> Results { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {}
 
@@ -66,6 +70,56 @@ namespace SportsManagementAPi.Repositories
                 .HasMany(t => t.Players)
                 .WithOne(p => p.Team)
                 .HasForeignKey(p => p.TeamId);
+
+            builder.Entity<Schedule>()
+                .HasKey(s => s.GameId);
+
+            builder.Entity<Schedule>()
+                .Property(s => s.HomeTeamId).IsRequired();
+            builder.Entity<Schedule>()
+                .Property(s => s.AwayTeamId).IsRequired();
+            builder.Entity<Schedule>()
+                .Property(s => s.HomeTeamName).IsRequired();
+            builder.Entity<Schedule>()
+                .Property(s => s.AwayTeamName).IsRequired();
+            builder.Entity<Schedule>()
+                .Property(s => s.ScheduledTime).IsRequired();
+            builder.Entity<Schedule>()
+                .Property(s => s.ManagerId).IsRequired();
+
+            builder.Entity<Manager>()
+                .HasMany(m => m.Schedules)
+                .WithOne(s => s.Manager)
+                .HasForeignKey(s => s.ManagerId);
+
+            builder.Entity<Team>()
+                .HasMany(t => t.Schedules)
+                .WithMany(s => s.Teams);
+
+
+
+            builder.Entity<Result>()
+                .HasKey(r => r.GameId);
+            
+            builder.Entity<Result>()
+                .Property(r => r.LoserTeamId).IsRequired();
+            builder.Entity<Result>()
+                .Property(r => r.WinnerTeamId).IsRequired();
+            builder.Entity<Result>()
+                .Property(r => r.ManagerId).IsRequired();
+
+            builder.Entity<Manager>()
+                .HasMany(m => m.Results)
+                .WithMany(r => r.Managers);
+
+            builder.Entity<Team>()
+                .HasMany(t => t.Results)
+                .WithMany(r => r.Teams);
+                
+            builder.Entity<Schedule>()
+                .HasOne(s => s.Result)
+                .WithOne(r => r.Schedule)
+                .HasForeignKey<Result>(r => r.GameId);
         }
     }
 }
