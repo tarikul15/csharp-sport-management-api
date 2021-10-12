@@ -94,5 +94,49 @@ namespace SportsManagementAPi.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<Schedule>> GetScheduleWithResultsByManagerId(Guid managerId)
+        {
+            return await _context.Schedules
+                .Include(s => s.Result)
+                .Where(s => s.ManagerId == managerId).ToListAsync();
+        }
+
+        public async Task PatchSchedule(Schedule schedule)
+        {
+            _context.Entry(schedule).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteScheduleByGameId(Guid gameId)
+        {
+            var scheduleToDelete = await _context.Schedules.SingleOrDefaultAsync(s => s.GameId == gameId);
+            _context.Schedules.Remove(scheduleToDelete);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Result> FindResultByGameId(Guid gameId)
+        {
+            return await _context.Results.SingleOrDefaultAsync(r => r.GameId == gameId);
+        }
+
+        public async Task PatchResult(Result result)
+        {
+            _context.Entry(result).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteResultById(Guid gameId)
+        {
+            var resultToDelete = await _context.Results.SingleOrDefaultAsync(r => r.GameId == gameId);
+            _context.Results.Remove(resultToDelete);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Result>> FindResultsByManagerId(Guid managerId)
+        {
+            return await _context.Results.Where(r => r.ManagerId == managerId).ToListAsync();
+        }
     }
 }

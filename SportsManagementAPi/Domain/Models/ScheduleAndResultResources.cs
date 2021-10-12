@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SportsManagementAPi.Domain.Models
 {
-    public class ScheduleResource
+    public class ScheduleAndResultResources
     {
         public Guid GameId { get; set; }
         public Guid HomeTeamId { get; set; }
@@ -14,7 +14,7 @@ namespace SportsManagementAPi.Domain.Models
         public string AwayTeamName { get; set; }
         public DateTime ScheduledTime { get; set; }
         public Guid ManagerId { get; set; }
-        public string ScheduleDetails { get; set; }
 
+        public ResultResource Result { get; set; }
     }
 }

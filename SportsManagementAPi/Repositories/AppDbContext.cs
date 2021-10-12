@@ -119,7 +119,8 @@ namespace SportsManagementAPi.Repositories
             builder.Entity<Schedule>()
                 .HasOne(s => s.Result)
                 .WithOne(r => r.Schedule)
-                .HasForeignKey<Result>(r => r.GameId);
+                .HasForeignKey<Result>(r => r.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -25,6 +25,22 @@ namespace SportsManagementAPi.Domain.Services
 
         Task<DeletePlayerResponse> DeletePlayerById(Guid playerId, Guid managerId);
 
-        Task<PatchPlayerResponse> PatchPlayer(Player player);
+        Task<PatchPlayerResponse> PatchPlayer(Player player, Guid managerId);
+
+        Task<GetScheduleIWithResultResponse> GetScheduleWithResultsByManagerId(Guid managerId);
+
+        Task<Schedule> FindScheduleByGameId(Guid gameId);
+
+        Task<PatchScheduleResponse> PatchSchedule(Schedule schedule, Guid managerId);
+
+        Task<DeleteScheduleResponse> DeleteScheduleByGameId(Guid gameId, Guid managerId);
+
+        Task<Result> FindResultByGameId(Guid gameId);
+
+        Task<PatchResultResponse> PatchResult(Result result, Guid managerId);
+
+        Task<DeleteResultResponse> DeleteResultByGameId(Guid gameId, Guid managerId);
+
+        Task<GetResultsResponse> FindResultsByManagerId(Guid managerId);
     }
 }

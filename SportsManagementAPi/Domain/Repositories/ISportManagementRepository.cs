@@ -33,5 +33,19 @@ namespace SportsManagementAPi.Domain.Repositories
 
         Task PatchPlayer(Player player);
 
+        Task<List<Schedule>> GetScheduleWithResultsByManagerId(Guid managerId);
+
+        Task PatchSchedule(Schedule schedule);
+
+        Task DeleteScheduleByGameId(Guid gameId);
+
+        Task<Result> FindResultByGameId(Guid gameId);
+
+        Task PatchResult(Result result);
+
+        Task DeleteResultById(Guid gameId);
+
+        Task<List<Result>> FindResultsByManagerId(Guid managerId);
+
     }
 }

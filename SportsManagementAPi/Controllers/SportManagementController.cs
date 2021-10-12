@@ -102,6 +102,7 @@ namespace SportsManagementAPi.Controllers
         {
             try
             {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
                 if (patchPlayer == null)
                 {
                     return BadRequest();
@@ -142,7 +143,7 @@ namespace SportsManagementAPi.Controllers
                 // Assign entity changes to original entity retrieved from database
                 player = _mapper.Map<PlayerResource, Player>(playerToPatch, player);
                 
-                var patchResponse = await _sportManagementService.PatchPlayer(player);
+                var patchResponse = await _sportManagementService.PatchPlayer(player, managerId);
 
                 // If everything was ok, return no content status code to users
                 return NoContent();
@@ -239,6 +240,137 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+
+
+        [HttpGet("getSchedulesWithResults")]
+        [Authorize]
+
+        public async Task<IActionResult> GetSchedulesAndResults()
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                var scheduleWithResultsResponse = await _sportManagementService.GetScheduleWithResultsByManagerId(managerId);
+
+                if (!scheduleWithResultsResponse.Success)
+                {
+                    return BadRequest(scheduleWithResultsResponse.Message);
+                }
+
+                var listOfScheduleResources = _mapper.Map<List<Schedule>, List<ScheduleAndResultResources>>(scheduleWithResultsResponse.Schedules);
+
+                return Ok(listOfScheduleResources);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        [HttpPatch("patchSchedule/{gameId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> PatchSchedule([FromRoute] Guid gameId, [FromBody] JsonPatchDocument<ScheduleResource> patchSchedule)
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                if (patchSchedule == null)
+                {
+                    return BadRequest();
+                }
+
+                var schedule = await _sportManagementService.FindScheduleByGameId(gameId);
+
+                if (schedule == null)
+                {
+                    return NotFound();
+                }
+
+                var scheduleToPatch = _mapper.Map<Schedule, ScheduleResource>(schedule);
+
+                patchSchedule.ApplyTo(scheduleToPatch, ModelState);
+
+                TryValidateModel(scheduleToPatch);
+
+                // If model is not valid, return the problem
+                if (!ModelState.IsValid || scheduleToPatch.GameId != schedule.GameId || scheduleToPatch.HomeTeamId != schedule.HomeTeamId ||
+                                            scheduleToPatch.HomeTeamName != schedule.HomeTeamName || scheduleToPatch.AwayTeamId != schedule.AwayTeamId 
+                                            || scheduleToPatch.AwayTeamName != schedule.AwayTeamName || scheduleToPatch.ManagerId != schedule.ManagerId 
+                                            || scheduleToPatch.ScheduledTime != schedule.ScheduledTime)
+                {
+                    if (scheduleToPatch.GameId != schedule.GameId)
+                    {
+                        ModelState.AddModelError("GameId", "Not Editable");
+                    }
+                    if (scheduleToPatch.HomeTeamId != schedule.HomeTeamId && schedule.ScheduledTime < DateTime.Now)
+                    {
+                        ModelState.AddModelError("HomeTeamId", "HomeTeamId is Not Editable as this is a past game");
+                    }
+                    if (scheduleToPatch.HomeTeamName != schedule.HomeTeamName && schedule.ScheduledTime < DateTime.Now)
+                    {
+                        ModelState.AddModelError("HomeTeamName", "HomeTeamName is Not Editable as this is a past game");
+                    }
+                    if (scheduleToPatch.AwayTeamName != schedule.AwayTeamName && schedule.ScheduledTime < DateTime.Now)
+                    {
+                        ModelState.AddModelError("AwayTeamName", "AwayTeamName is Not Editable as this is a past game");
+                    }
+                    if (scheduleToPatch.AwayTeamId != schedule.AwayTeamId && schedule.ScheduledTime < DateTime.Now)
+                    {
+                        ModelState.AddModelError("AwayTeamId", "AwayTeamId is Not Editable as this is a past game");
+                    }
+                    if (scheduleToPatch.ScheduledTime != schedule.ScheduledTime && schedule.ScheduledTime < DateTime.Now)
+                    {
+                        ModelState.AddModelError("ScheduledTime", "ScheduledTime is Not Editable as this is a past game");
+                    }
+                    if (scheduleToPatch.ManagerId != schedule.ManagerId)
+                    {
+                        ModelState.AddModelError("ManagerId", "Not Editable");
+                    }
+
+                    return BadRequest(ModelState);
+                }
+
+                // Assign entity changes to original entity retrieved from database
+                schedule = _mapper.Map<ScheduleResource, Schedule>(scheduleToPatch, schedule);
+
+                var patchscheduleResponse = await _sportManagementService.PatchSchedule(schedule, managerId);
+
+                // If everything was ok, return no content status code to users
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        [HttpDelete("deleteSchedules/{gameId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> DeleteSchedule([FromRoute] Guid gameId)
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                var deleteResponse = await _sportManagementService.DeleteScheduleByGameId(gameId, managerId);
+
+                if (!deleteResponse.Success)
+                {
+                    return BadRequest(deleteResponse.Message);
+                }
+
+                return Ok(deleteResponse.Message);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+
         [HttpPost("result")]
         [Authorize]
         public async Task<IActionResult> CreateResult([FromBody] CreateResultRequest resultRequest)
@@ -273,18 +405,116 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [HttpGet("getResults")]
+        [Authorize]
 
+        public async Task<IActionResult> GetResults()
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                var scheduleWithResultsResponse = await _sportManagementService.FindResultsByManagerId(managerId);
 
+                if (!scheduleWithResultsResponse.Success)
+                {
+                    return BadRequest(scheduleWithResultsResponse.Message);
+                }
 
-        //public IActionResult Privacy()
-        //{
-        //    return View();
-        //}
+                var listOfResults = _mapper.Map<List<Result>, List<ResultResource>>(scheduleWithResultsResponse.Results);
 
-        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+                return Ok(listOfResults);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        [HttpPatch("patchResult/{gameId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> PatchResult([FromRoute] Guid gameId, [FromBody] JsonPatchDocument<ResultResource> patchResult)
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                if (patchResult == null)
+                {
+                    return BadRequest();
+                }
+
+                var result = await _sportManagementService.FindResultByGameId(gameId);
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                var resultToPatch = _mapper.Map<Result, ResultResource>(result);
+
+                patchResult.ApplyTo(resultToPatch, ModelState);
+
+                TryValidateModel(resultToPatch);
+
+                // If model is not valid, return the problem
+                if (!ModelState.IsValid || resultToPatch.GameId != result.GameId || resultToPatch.WinnerTeamId != result.WinnerTeamId ||
+                                            resultToPatch.LoserTeamId != result.LoserTeamId || resultToPatch.ManagerId != result.ManagerId)
+                {
+                    if (resultToPatch.GameId != result.GameId)
+                    {
+                        ModelState.AddModelError("GameId", "Not Editable");
+                    }
+                    if (resultToPatch.WinnerTeamId != result.WinnerTeamId)
+                    {
+                        ModelState.AddModelError("WinnerTeamId", "Not Editable");
+                    }
+                    if (resultToPatch.LoserTeamId != result.LoserTeamId)
+                    {
+                        ModelState.AddModelError("LoserTeamId", "Not Editable");
+                    }
+                    if (resultToPatch.ManagerId != result.ManagerId)
+                    {
+                        ModelState.AddModelError("ManagerId", "Not Editable");
+                    }
+
+                    return BadRequest(ModelState);
+                }
+
+                // Assign entity changes to original entity retrieved from database
+                result = _mapper.Map<ResultResource, Result>(resultToPatch, result);
+
+                var patchResultResponse = await _sportManagementService.PatchResult(result, managerId);
+
+                // If everything was ok, return no content status code to users
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        [HttpDelete("deleteResult/{gameId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> DeleteResult([FromRoute] Guid gameId)
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                var deleteResponse = await _sportManagementService.DeleteResultByGameId(gameId, managerId);
+
+                if (!deleteResponse.Success)
+                {
+                    return BadRequest(deleteResponse.Message);
+                }
+
+                return Ok(deleteResponse.Message);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

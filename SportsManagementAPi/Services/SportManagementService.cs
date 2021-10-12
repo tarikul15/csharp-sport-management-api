@@ -122,7 +122,7 @@ namespace SportsManagementAPi.Services
             var existingPlayer = await _sportManagementRepository.FindPlayerById(playerId);
             if (existingPlayer == null)
             {
-                return new DeletePlayerResponse(false, "Can update the Result of a Game as it is created by another manager.", null);
+                return new DeletePlayerResponse(false, "Player Not Found.", null);
             }
 
             if (existingPlayer.ManagerId != managerId)
@@ -140,10 +140,99 @@ namespace SportsManagementAPi.Services
             return await _sportManagementRepository.FindPlayerById(id);
         }
 
-        public async Task<PatchPlayerResponse> PatchPlayer(Player player)
+        public async Task<PatchPlayerResponse> PatchPlayer(Player player, Guid managerId)
         {
+            if (player.ManagerId != managerId)
+            {
+                return new PatchPlayerResponse(false, "This Player is not managed by the requesting manager", null);
+            }
+
             await _sportManagementRepository.PatchPlayer(player);
             return new PatchPlayerResponse(true, "Patch Successful", null);
+        }
+
+        public async Task<GetScheduleIWithResultResponse> GetScheduleWithResultsByManagerId(Guid managerId)
+        {
+            var scheduleList = await _sportManagementRepository.GetScheduleWithResultsByManagerId(managerId);
+            return new GetScheduleIWithResultResponse(true, "", scheduleList);
+        }
+
+        public async Task<Schedule> FindScheduleByGameId(Guid gameId)
+        {
+            return await _sportManagementRepository.FindScheduleByGameId(gameId);
+
+        }
+
+        public async Task<PatchScheduleResponse> PatchSchedule(Schedule schedule, Guid managerId)
+        {
+            if (schedule.ManagerId != managerId)
+            {
+                return new PatchScheduleResponse(false, "The Requesting manager didn't create this game", null);
+            }
+
+            await _sportManagementRepository.PatchSchedule(schedule);
+            return new PatchScheduleResponse(true, "patch successful", null);
+
+        }
+
+        public async Task<DeleteScheduleResponse> DeleteScheduleByGameId(Guid gameId, Guid managerId)
+        {
+            var existingSchedule = await _sportManagementRepository.FindScheduleByGameId(gameId);
+
+            if (existingSchedule == null)
+            {
+                return new DeleteScheduleResponse(false, "Schedule not found.", null);
+            }
+
+            if (existingSchedule.ManagerId != managerId)
+            {
+                return new DeleteScheduleResponse(false, "This game is not created by the requesting manager.", null);
+            }
+
+            await _sportManagementRepository.DeleteScheduleByGameId(gameId);
+            return new DeleteScheduleResponse(true, "delete successful", null);
+        }
+
+        public async Task<Result> FindResultByGameId(Guid gameId)
+        {
+            return await _sportManagementRepository.FindResultByGameId(gameId);
+        }
+
+        public async Task<PatchResultResponse> PatchResult(Result result, Guid managerId)
+        {
+
+            if (result.ManagerId != managerId)
+            {
+                return new PatchResultResponse(false, "The Requesting manager didn't create this game", null);
+            }
+
+            await _sportManagementRepository.PatchResult(result);
+            return new PatchResultResponse(true, "Patch Successful", null);
+        }
+
+        public async Task<DeleteResultResponse> DeleteResultByGameId(Guid gameId, Guid managerId)
+        {
+            var existingResult = await _sportManagementRepository.FindResultByGameId(gameId);
+            if (existingResult == null)
+            {
+                return new DeleteResultResponse(false, "Result Not Found.", null);
+            }
+
+            if (existingResult.ManagerId != managerId)
+            {
+                return new DeleteResultResponse(false, "This game is not created by the manager requesting this action.", null);
+            }
+
+            await _sportManagementRepository.DeleteResultById(gameId);
+
+            return new DeleteResultResponse(true, "Delete Successful", null);
+
+        }
+
+        public async Task<GetResultsResponse> FindResultsByManagerId(Guid managerId)
+        {
+            var resultList = await _sportManagementRepository.FindResultsByManagerId(managerId);
+            return new GetResultsResponse(true, "", resultList);
         }
 
     }
