@@ -9,13 +9,11 @@ namespace SportsManagementAPi.Services
     public class ManagerService : IManagerService
     {
         private readonly IManagerRepository _userRepository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
 
-        public ManagerService(IManagerRepository userRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        public ManagerService(IManagerRepository userRepository, IPasswordHasher passwordHasher)
         {
             _passwordHasher = passwordHasher;
-            _unitOfWork = unitOfWork;
             _userRepository = userRepository;
         }
 
@@ -30,7 +28,6 @@ namespace SportsManagementAPi.Services
             user.Password = _passwordHasher.HashPassword(user.Password);
 
             await _userRepository.AddAsync(user);
-            await _unitOfWork.CompleteAsync();
 
             return new CreateManagerResponse(true, null, user);
         }

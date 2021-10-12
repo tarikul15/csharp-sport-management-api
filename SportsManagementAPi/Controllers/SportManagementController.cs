@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using SportsManagementAPi.Domain.Models;
 using SportsManagementAPi.Domain.Services;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace SportsManagementAPi.Controllers
 {
@@ -94,6 +95,64 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [HttpPatch("patchPlayer/{playerId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> PatchPlayer([FromRoute] Guid playerId, [FromBody] JsonPatchDocument<PlayerResource> patchPlayer)
+        {
+            try
+            {
+                if (patchPlayer == null)
+                {
+                    return BadRequest();
+                }
+
+                var player = await _sportManagementService.FindPlayerByIdAsync(playerId);
+
+                if (player == null)
+                {
+                    return NotFound();
+                }
+
+                var playerToPatch = _mapper.Map<Player,PlayerResource>(player);
+
+                patchPlayer.ApplyTo(playerToPatch, ModelState);
+
+                TryValidateModel(playerToPatch);
+
+                // If model is not valid, return the problem
+                if (!ModelState.IsValid || playerToPatch.Id != player.Id || playerToPatch.TeamId != player.TeamId || playerToPatch.ManagerId != player.ManagerId)
+                {
+                    if (playerToPatch.Id != player.Id)
+                    {
+                        ModelState.AddModelError("Id", "Not Editable");
+                    }
+                    if (playerToPatch.TeamId != player.TeamId)
+                    {
+                        ModelState.AddModelError("TeamId", "Not Editable");
+                    }
+                    if (playerToPatch.ManagerId != player.ManagerId)
+                    {
+                        ModelState.AddModelError("ManagerId", "Not Editable");
+                    }
+
+                    return BadRequest(ModelState);
+                }
+
+                // Assign entity changes to original entity retrieved from database
+                player = _mapper.Map<PlayerResource, Player>(playerToPatch, player);
+                
+                var patchResponse = await _sportManagementService.PatchPlayer(player);
+
+                // If everything was ok, return no content status code to users
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
 
         [HttpGet("getPlayers")]
         [Authorize]
@@ -120,7 +179,7 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
-        [HttpDelete("deletePlayer/{playerId}")]
+        [HttpDelete("deletePlayer/{playerId:guid}")]
         [Authorize]
 
         public async Task<IActionResult> DeletePlayer([FromRoute] Guid playerId)

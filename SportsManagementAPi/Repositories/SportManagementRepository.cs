@@ -21,6 +21,7 @@ namespace SportsManagementAPi.Repositories
         public async Task AddTeamAsync(Team team)
         {
             await _context.Teams.AddAsync(team);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Team> FindTeamByName(string name)
@@ -32,6 +33,7 @@ namespace SportsManagementAPi.Repositories
         public async Task AddPlayerAsync(Player player)
         {
             await _context.Players.AddAsync(player);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Player> FindPlayerByName(string name)
@@ -42,6 +44,7 @@ namespace SportsManagementAPi.Repositories
         public async Task AddScheduleAsync(Schedule schedule)
         {
             await _context.Schedules.AddAsync(schedule);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Schedule> FindScheduleByTimeAndTeams(DateTime time, Guid homeTeamId, Guid awayTeamId)
@@ -54,6 +57,7 @@ namespace SportsManagementAPi.Repositories
         public async Task AddResultAsync(Result result)
         {
             await _context.Results.AddAsync(result);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Schedule> FindScheduleByGameId(Guid gameId)
@@ -75,11 +79,20 @@ namespace SportsManagementAPi.Repositories
         {
             var playerToDelete = await _context.Players.SingleOrDefaultAsync(p => p.Id == id);
              _context.Players.Remove(playerToDelete);
+             await _context.SaveChangesAsync();
         }
 
         public async Task<Player> FindPlayerById(Guid playerId)
         {
             return await _context.Players.SingleOrDefaultAsync(p => p.Id == playerId);
         }
+
+        public async Task PatchPlayer(Player player)
+        {
+            _context.Entry(player).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

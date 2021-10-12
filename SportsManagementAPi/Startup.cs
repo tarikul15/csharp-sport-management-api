@@ -33,13 +33,12 @@ namespace SportsManagementAPi
                 options.UseInMemoryDatabase("SportManagementApi");
             });
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();
             //services.AddCustomSwagger();
 
             services.AddScoped<IManagerRepository, ManagerRepository>();
             services.AddScoped<ISportManagementRepository, SportManagementRepository>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddSingleton<ITokenHandler, SportsManagementAPi.Security.TokenHandler>();

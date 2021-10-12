@@ -19,6 +19,7 @@ namespace SportsManagementAPi.Repositories
         public async Task AddAsync(Manager manager)
         {
             await _context.Managers.AddAsync(manager);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Manager> FindByEmailAsync(string email)

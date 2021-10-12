@@ -15,6 +15,8 @@ namespace SportsManagementAPi.Domain.Services
 
         Task<Player> FindPlayerByNameAsync(string name);
 
+        Task<Player> FindPlayerByIdAsync(Guid id);
+
         Task<CreateScheduleResponse> CreateScheduleAsync(Schedule schedule);
 
         Task<CreateResultResponse> CreateResultAsync(Result result);
@@ -22,5 +24,7 @@ namespace SportsManagementAPi.Domain.Services
         Task<GetPlayersResponse> GetPlayersByManagerId(Guid managerId);
 
         Task<DeletePlayerResponse> DeletePlayerById(Guid playerId, Guid managerId);
+
+        Task<PatchPlayerResponse> PatchPlayer(Player player);
     }
 }

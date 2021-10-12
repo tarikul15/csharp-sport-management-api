@@ -10,11 +10,9 @@ namespace SportsManagementAPi.Services
     public class SportManagementService : ISportManagementService
     {
         private readonly ISportManagementRepository _sportManagementRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public SportManagementService(ISportManagementRepository sportManagementRepository, IUnitOfWork unitOfWork)
+        public SportManagementService(ISportManagementRepository sportManagementRepository)
         {
-            _unitOfWork = unitOfWork;
             _sportManagementRepository = sportManagementRepository;
         }
 
@@ -26,9 +24,7 @@ namespace SportsManagementAPi.Services
                 return new CreateTeamResponse(false, "Name already in use.", null);
             }
 
-
             await _sportManagementRepository.AddTeamAsync(team);
-            await _unitOfWork.CompleteAsync();
 
             return new CreateTeamResponse(true, null, team);
         }
@@ -53,7 +49,6 @@ namespace SportsManagementAPi.Services
             }
 
             await _sportManagementRepository.AddPlayerAsync(player);
-            await _unitOfWork.CompleteAsync();
 
             return new CreatePlayerResponse(true, null, player);
         }
@@ -97,7 +92,6 @@ namespace SportsManagementAPi.Services
             }
 
             await _sportManagementRepository.AddScheduleAsync(schedule);
-            await _unitOfWork.CompleteAsync();
 
             return new CreateScheduleResponse(true, null, schedule);
 
@@ -112,7 +106,6 @@ namespace SportsManagementAPi.Services
             }
 
             await _sportManagementRepository.AddResultAsync(result);
-            await _unitOfWork.CompleteAsync();
 
             return new CreateResultResponse(true, null, result);
         }
@@ -138,9 +131,19 @@ namespace SportsManagementAPi.Services
             }
 
             await _sportManagementRepository.DeletePlayerById(existingPlayer.Id);
-            await _unitOfWork.CompleteAsync();
 
             return new DeletePlayerResponse(true, "Delete Successful", null);
+        }
+
+        public async Task<Player> FindPlayerByIdAsync(Guid id)
+        {
+            return await _sportManagementRepository.FindPlayerById(id);
+        }
+
+        public async Task<PatchPlayerResponse> PatchPlayer(Player player)
+        {
+            await _sportManagementRepository.PatchPlayer(player);
+            return new PatchPlayerResponse(true, "Patch Successful", null);
         }
 
     }

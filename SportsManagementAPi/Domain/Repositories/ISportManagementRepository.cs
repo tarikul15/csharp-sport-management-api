@@ -31,5 +31,7 @@ namespace SportsManagementAPi.Domain.Repositories
 
         Task DeletePlayerById(Guid id);
 
+        Task PatchPlayer(Player player);
+
     }
 }
