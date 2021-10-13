@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementAPi.Domain.Models;
 using SportsManagementAPi.Domain.Security;
@@ -18,6 +19,9 @@ namespace SportsManagementAPi.Controllers
             _mapper = mapper;
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AccessTokenResource), StatusCodes.Status200OK)]
         [Route("/api/login")]
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] CreateManagerRequest userCredentials)
@@ -37,6 +41,9 @@ namespace SportsManagementAPi.Controllers
             return Ok(accessTokenResource);
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AccessTokenResource), StatusCodes.Status200OK)]
         [Route("/api/token/refresh")]
         [HttpPost]
         public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenResource refreshTokenResource)
@@ -56,6 +63,9 @@ namespace SportsManagementAPi.Controllers
             return Ok(tokenResource);
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Route("/api/token/revoke")]
         [HttpPost]
         public IActionResult RevokeToken([FromBody] RevokeTokenResource revokeTokenResource)

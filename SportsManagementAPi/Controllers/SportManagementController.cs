@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SportsManagementAPi.Domain.Models;
 using SportsManagementAPi.Domain.Services;
 using Microsoft.AspNetCore.JsonPatch;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace SportsManagementAPi.Controllers
 {
@@ -27,6 +29,9 @@ namespace SportsManagementAPi.Controllers
             _mapper = mapper;
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(TeamResource), StatusCodes.Status200OK)]
         [HttpPost("createTeam")]
         [Authorize]
 
@@ -58,6 +63,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(PlayerResource), StatusCodes.Status200OK)]
         [HttpPost("createPlayer")]
         [Authorize]
 
@@ -95,6 +103,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpPatch("patchPlayer/{playerId:guid}")]
         [Authorize]
 
@@ -121,7 +132,6 @@ namespace SportsManagementAPi.Controllers
 
                 TryValidateModel(playerToPatch);
 
-                // If model is not valid, return the problem
                 if (!ModelState.IsValid || playerToPatch.Id != player.Id || playerToPatch.TeamId != player.TeamId || playerToPatch.ManagerId != player.ManagerId)
                 {
                     if (playerToPatch.Id != player.Id)
@@ -140,12 +150,10 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Assign entity changes to original entity retrieved from database
                 player = _mapper.Map<PlayerResource, Player>(playerToPatch, player);
                 
                 var patchResponse = await _sportManagementService.PatchPlayer(player, managerId);
 
-                // If everything was ok, return no content status code to users
                 return NoContent();
             }
             catch (Exception ex)
@@ -155,6 +163,9 @@ namespace SportsManagementAPi.Controllers
         }
 
 
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(List<PlayerResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetPlayersResponse), StatusCodes.Status404NotFound)]
         [HttpGet("getPlayers")]
         [Authorize]
 
@@ -180,6 +191,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(DeletePlayerResponse), StatusCodes.Status404NotFound)]
         [HttpDelete("deletePlayer/{playerId:guid}")]
         [Authorize]
 
@@ -195,7 +209,7 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(deleteResponse.Message);
                 }
 
-                return Ok(deleteResponse.Message);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -204,7 +218,9 @@ namespace SportsManagementAPi.Controllers
         }
 
 
-
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(ScheduleResource), StatusCodes.Status200OK)]
         [HttpPost("schedule")]
         [Authorize]
 
@@ -231,8 +247,8 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(response.Message);
                 }
 
-                var playerResource = _mapper.Map<Schedule, ScheduleResource>(response.Schedule);
-                return Ok(playerResource);
+                var scheduleResource = _mapper.Map<Schedule, ScheduleResource>(response.Schedule);
+                return Ok(scheduleResource);
             }
             catch (Exception ex)
             {
@@ -241,7 +257,9 @@ namespace SportsManagementAPi.Controllers
         }
 
 
-
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(List<ScheduleAndResultResources>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetScheduleIWithResultResponse), StatusCodes.Status404NotFound)]
         [HttpGet("getSchedulesWithResults")]
         [Authorize]
 
@@ -267,7 +285,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
-
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpPatch("patchSchedule/{gameId:guid}")]
         [Authorize]
 
@@ -294,7 +314,6 @@ namespace SportsManagementAPi.Controllers
 
                 TryValidateModel(scheduleToPatch);
 
-                // If model is not valid, return the problem
                 if (!ModelState.IsValid || scheduleToPatch.GameId != schedule.GameId || scheduleToPatch.HomeTeamId != schedule.HomeTeamId ||
                                             scheduleToPatch.HomeTeamName != schedule.HomeTeamName || scheduleToPatch.AwayTeamId != schedule.AwayTeamId 
                                             || scheduleToPatch.AwayTeamName != schedule.AwayTeamName || scheduleToPatch.ManagerId != schedule.ManagerId 
@@ -332,12 +351,10 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Assign entity changes to original entity retrieved from database
                 schedule = _mapper.Map<ScheduleResource, Schedule>(scheduleToPatch, schedule);
 
                 var patchscheduleResponse = await _sportManagementService.PatchSchedule(schedule, managerId);
 
-                // If everything was ok, return no content status code to users
                 return NoContent();
             }
             catch (Exception ex)
@@ -346,7 +363,10 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
-        [HttpDelete("deleteSchedules/{gameId:guid}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(DeleteScheduleResponse), StatusCodes.Status404NotFound)]
+        [HttpDelete("deleteSchedule/{gameId:guid}")]
         [Authorize]
 
         public async Task<IActionResult> DeleteSchedule([FromRoute] Guid gameId)
@@ -361,7 +381,7 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(deleteResponse.Message);
                 }
 
-                return Ok(deleteResponse.Message);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -370,7 +390,9 @@ namespace SportsManagementAPi.Controllers
         }
 
 
-
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(ResultResource), StatusCodes.Status200OK)]
         [HttpPost("result")]
         [Authorize]
         public async Task<IActionResult> CreateResult([FromBody] CreateResultRequest resultRequest)
@@ -405,6 +427,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(List<ResultResource>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetResultsResponse), StatusCodes.Status404NotFound)]
         [HttpGet("getResults")]
         [Authorize]
 
@@ -430,6 +455,10 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPatch("patchResult/{gameId:guid}")]
         [Authorize]
 
@@ -494,6 +523,9 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(DeleteResultResponse), StatusCodes.Status404NotFound)]
         [HttpDelete("deleteResult/{gameId:guid}")]
         [Authorize]
 
@@ -509,7 +541,7 @@ namespace SportsManagementAPi.Controllers
                     return BadRequest(deleteResponse.Message);
                 }
 
-                return Ok(deleteResponse.Message);
+                return NoContent();
             }
             catch (Exception ex)
             {

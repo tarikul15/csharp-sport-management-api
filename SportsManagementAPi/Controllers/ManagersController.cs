@@ -1,27 +1,32 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SportsManagementAPi.Domain.Models;
 using SportsManagementAPi.Domain.Services;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace sportsManagementAPi.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
-    public class UsersController : Controller
+    public class ManagersController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IManagerService _userService;
 
-        public UsersController(IManagerService userService, IMapper mapper)
+        public ManagersController(IManagerService userService, IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
         }
 
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(ManagerResource), StatusCodes.Status200OK)]
         [HttpPost]
-        public async Task<IActionResult> CreateUserAsync([FromBody] CreateManagerRequest userCredentials)
+        public async Task<IActionResult> CreateManagerAsync([FromBody] CreateManagerRequest userCredentials)
         {
             if (!ModelState.IsValid)
             {

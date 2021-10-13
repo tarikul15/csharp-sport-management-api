@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SportsManagementAPi.Domain.Repositories;
 using SportsManagementAPi.Domain.Security;
 using SportsManagementAPi.Domain.Services;
+using SportsManagementAPi.Extensions;
 using SportsManagementAPi.Repositories;
 using SportsManagementAPi.Security;
 using SportsManagementAPi.Services;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 
 namespace SportsManagementAPi
@@ -69,6 +70,7 @@ namespace SportsManagementAPi
                 });
 
             services.AddAutoMapper(this.GetType().Assembly);
+            services.ConfigureSwagger();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -86,6 +88,17 @@ namespace SportsManagementAPi
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/isalive");
             });
+
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "swagger/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pbp.Payments.Pas.Cloud.Api");
+                c.SupportedSubmitMethods(SubmitMethod.Get);
+            });
+
         }
     }
 
