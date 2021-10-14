@@ -14,6 +14,7 @@ namespace SportsManagementAPi.Domain.Models
         public string AwayTeamName { get; set; }
         public DateTime ScheduledTime { get; set; }
         public Guid ManagerId { get; set; }
+        public string ScheduleDetails { get; set; }
 
         public ResultResource Result { get; set; }
     }

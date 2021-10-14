@@ -11,7 +11,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["SportsManagementAPi.csproj", "."]
-RUN dotnet restore "./SportsManagementAPi.csproj"
+#RUN dotnet restore "./SportsManagementAPi.csproj"
 COPY . .
 WORKDIR "/src/."
 RUN dotnet build "SportsManagementAPi.csproj" -c Release -o /app/build

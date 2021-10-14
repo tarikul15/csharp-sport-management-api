@@ -63,6 +63,31 @@ namespace SportsManagementAPi.Controllers
             }
         }
 
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(DeleteTeamResponse), StatusCodes.Status404NotFound)]
+        [HttpDelete("deleteTeam/{teamId:guid}")]
+        [Authorize]
+
+        public async Task<IActionResult> DeleteTeam([FromRoute] Guid teamId)
+        {
+            try
+            {
+                var managerId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "jti")?.Value);
+                var deleteResponse = await _sportManagementService.DeleteTeamId(teamId, managerId);
+
+                if (!deleteResponse.Success)
+                {
+                    return BadRequest(deleteResponse.Message);
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(PlayerResource), StatusCodes.Status200OK)]

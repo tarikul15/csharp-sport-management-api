@@ -42,5 +42,7 @@ namespace SportsManagementAPi.Domain.Services
         Task<DeleteResultResponse> DeleteResultByGameId(Guid gameId, Guid managerId);
 
         Task<GetResultsResponse> FindResultsByManagerId(Guid managerId);
+
+        Task<DeleteTeamResponse> DeleteTeamId(Guid teamId, Guid managerId);
     }
 }

@@ -47,5 +47,7 @@ namespace SportsManagementAPi.Domain.Repositories
 
         Task<List<Result>> FindResultsByManagerId(Guid managerId);
 
+        Task DeleteTeamById(Guid teamId);
+
     }
 }

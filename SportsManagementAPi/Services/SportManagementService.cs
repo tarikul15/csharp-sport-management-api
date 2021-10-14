@@ -235,5 +235,23 @@ namespace SportsManagementAPi.Services
             return new GetResultsResponse(true, "", resultList);
         }
 
+        public async Task<DeleteTeamResponse> DeleteTeamId(Guid teamId, Guid managerId)
+        {
+            var existingTeam = await _sportManagementRepository.FindTeamById(teamId);
+            if (existingTeam == null)
+            {
+                return new DeleteTeamResponse(false, "Team Not Found.", null);
+            }
+
+            if (existingTeam.ManagerId != managerId)
+            {
+                return new DeleteTeamResponse(false, "This team is not created by the manager requesting this action.", null);
+            }
+
+            await _sportManagementRepository.DeleteTeamById(teamId);
+
+            return new DeleteTeamResponse(true, "Delete Successful", null);
+        }
+
     }
 }

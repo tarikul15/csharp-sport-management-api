@@ -138,5 +138,12 @@ namespace SportsManagementAPi.Repositories
         {
             return await _context.Results.Where(r => r.ManagerId == managerId).ToListAsync();
         }
+
+        public async Task DeleteTeamById(Guid teamId)
+        {
+            var teamToDelete = await _context.Teams.SingleOrDefaultAsync(t => t.Id == teamId);
+            _context.Teams.Remove(teamToDelete);
+            await _context.SaveChangesAsync();
+        }
     }
 }
